@@ -2,15 +2,15 @@
   <div class="content">
     <h2>Essa é a página de compras</h2>
     <div class="products-collection">
-      <div v-for="item in itemsList" v-bind:key="item" class="product">
-        <h3>{{ item["title"] }}</h3>
+      <div v-for="item in itemsList" :key="item.id" class="product">
         <img
-          v-bind:src="item['img']"
-          v-bind:alt="'Imagem de ' + item['title']"
-          v-bind:title="'Imagem de ' + item['title']"
+          :src="item.img"
+          :alt="'Imagem de ' + item['title']"
+          :title="'Imagem de ' + item['title']"
         />
-        <p>R${{ item["price"] }}</p>
-        <router-link to="/details"
+        <h3>{{ item.title }}</h3>
+        <p>R${{ item.price.toFixed(2) }}</p>
+        <router-link to="/detalhes"
           ><input
             type="button"
             value="Ver Detalhes"
@@ -23,13 +23,18 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import axios from "axios";
-//import EventBus from "@/services/event-bus.js";
+import { emitter } from "@/services/event-bus";
 export default defineComponent({
   name: "ContentPlace",
   data() {
     return {
-      itemsList: [],
-      testeId: "",
+      itemsList: [] as {
+        title: string;
+        price: number;
+        img: string;
+        id: string;
+      }[],
+      id: "",
     };
   },
   async mounted() {
@@ -40,8 +45,8 @@ export default defineComponent({
   },
   methods: {
     showDetails(itemId: string) {
-      this.testeId = itemId;
-      //EventBus.$emit("selectedId", this.testeId);
+      this.id = itemId;
+      emitter.emit("selectedId", this.id);
     },
   },
 });
@@ -65,28 +70,43 @@ export default defineComponent({
   display: flex;
   height: 100%;
   flex-wrap: wrap;
-  row-gap: 1rem;
+  gap: 1rem;
   justify-content: center;
   align-items: center;
-}
-.products-collection h3 {
-  height: 50px;
-  width: 100%;
-  text-align: center;
-  vertical-align: center;
+  padding-bottom: 1rem;
 }
 .product {
   width: 180px;
   height: auto;
+  background-color: white;
+  border-radius: 0.3rem;
+}
+.product > h3 {
+  height: 50px;
+  width: 100%;
+  font-size: 20px;
+  text-align: center;
+  align-items: center;
+  word-wrap: break-word;
+  white-space: normal;
+  overflow: hidden;
+  display: -webkit-box;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 img {
-  width: 150px;
+  width: 100%;
   height: 200px;
+  object-fit: contain;
+  margin-top: 1rem;
+  mix-blend-mode: multiply;
 }
 input {
   height: 2rem;
   border: none;
   width: 90%;
+  margin-block: 1rem;
   border-radius: 0.4rem;
   background-color: rgb(231, 193, 69);
   font-size: 1em;
