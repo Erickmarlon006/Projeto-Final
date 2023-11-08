@@ -1,11 +1,7 @@
 <template>
   <div class="content">
     <h2>Essa é a página dos detalhes</h2>
-    <div v-if="itemDetails.length">
-      <div v-for="item in itemDetails" :key="item.id" class="item-card">
-        <h3>{{ item.title }}</h3>
-      </div>
-    </div>
+    <h3 v-if="itemTitle">{{ itemTitle }}</h3>
   </div>
 </template>
 <script lang="ts">
@@ -24,9 +20,11 @@ export default defineComponent({
         img: string;
         id: string;
       }[],
+      itemTitle: "",
     };
   },
-  async mounted() {
+
+  async created() {
     this.itemsList = await axios
       .get("http://localhost:3000/items/")
       .then((resp) => resp.data)
@@ -37,13 +35,13 @@ export default defineComponent({
     async getItemId() {
       emitter.on("selectedId", async (id: string) => {
         this.itemDetailsId = id;
-        await this.getItemDetails(this.itemDetailsId);
+        this.getItemDetails(this.itemDetailsId);
       });
     },
     async getItemDetails(id: string) {
-      console.log(id);
       this.itemDetails = this.itemsList.filter((item) => item["id"] === id);
-      console.log(this.itemDetails);
+      this.itemTitle = this.itemDetails[0].title;
+      console.log(this.itemTitle);
     },
   },
 });
